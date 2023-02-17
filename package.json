@@ -1,0 +1,26 @@
+{
+  "name": "metamask-pay",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Alfredo Ramirez",
+    "email": "alframirezg@gmail.com",
+    "github": "https://github.com/alframirez"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@meforma/vue-toaster": "^1.3.0",
+    "ethers": "^5.7.2",
+    "vue": "^3.2.41",
+    "vue-router": "^4.1.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^3.1.2",
+    "vite": "^3.1.8"
+  }
+}
