@@ -1,4 +1,6 @@
-# metamask-pay
+# smart-contract-example
+
+https://alframirez.github.io/smart-contract-example/
 
 This template should help get you started developing with Vue 3 in Vite.
 
