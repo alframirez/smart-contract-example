@@ -2,7 +2,7 @@
   <div class="conections-container">
     <!-- Init amount section -->
     <div class="amount-container">
-      <label>Amount to pay *:</label>
+      <label>Extra Bonus *:</label>
       <input
         type="number"
         id="input_amount_id"
@@ -96,6 +96,18 @@
       </div>
       <!-- End Metamask options -->
     </div>
+    <div>
+      <div>
+        <h1>Contract of service</h1>
+      </div>
+      <div>Contract Address {{ contract_service_address }}</div>
+      <div>Contract Balance {{ contract_service_balance }}</div>
+      <div>
+        Contract Price {{ contract_service_price + contract_service_symbol }}
+      </div>
+      <button @click="PayService()">Pay Service</button>
+      <button @click="ValidateService()">Validate Service</button>
+    </div>
     <!-- End Wallet cards -->
   </div>
 </template>
@@ -127,6 +139,12 @@ export default {
       token_decimals: import.meta.env.VITE_TOKEN_DECIMALS,
       receiver_account: import.meta.env.VITE_RECEIVER_ACCOUNT,
       token_abi: import.meta.env.VITE_TOKEN_ABI,
+
+      contract_service_address: import.meta.env.VITE_CONTRACT_SERVICE_ADDRESS,
+      contract_service_abi: import.meta.env.VITE_CONTRACT_SERVICE_ABI,
+      contract_service_balance: "",
+      contract_service_price: "",
+      contract_service_symbol: "",
     };
   },
   mounted() {
@@ -360,6 +378,110 @@ export default {
       let address = await signer.getAddress();
       console.log("addre:", address);
     },
+
+    // service
+
+    ValidateService() {
+      const contractAddress = this.contract_service_address;
+      const contractAbi = this.contract_service_abi;
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+
+      const contract = new ethers.Contract(
+        contractAddress,
+        contractAbi,
+        signer
+      );
+
+      contract
+        .confirmarServicioRealizado()
+        .then(() => {
+          this.ContractServiceData();
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+
+    PayService() {
+      const contractAddress = this.contract_service_address;
+      const contractAbi = this.contract_service_abi;
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+
+      const contract = new ethers.Contract(
+        contractAddress,
+        contractAbi,
+        signer
+      );
+
+      contract
+        .comprar({
+          value: ethers.utils.parseEther(
+            this.contract_service_price.toString()
+          ),
+        })
+        .then((transaccion) => {
+          console.log("Transacción de compra enviada: " + transaccion.hash);
+          this.ContractServiceData();
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+
+    ContractServiceData() {
+      const contractAddress = this.contract_service_address;
+      const contractAbi = this.contract_service_abi;
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+
+      const contract = new ethers.Contract(
+        contractAddress,
+        contractAbi,
+        signer
+      );
+
+      contract
+        .precio()
+        .then((resultado) => {
+          this.contract_service_price = resultado / 10 ** 18;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
+      provider
+        .getBalance(contractAddress)
+        .then((balance) => {
+          provider.getNetwork().then((network) => {
+            this.contract_service_balance = balance / 10 ** 18;
+            this.contract_service_balance =
+              this.contract_service_balance.toString() + network.name;
+            this.contract_service_symbol = network.name;
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
+      contract
+        .comprador()
+        .then(() => {})
+        .catch((error) => {
+          console.error(error);
+        });
+
+      contract
+        .vendedor()
+        .then(() => {})
+        .catch((error) => {
+          console.error(error);
+        });
+    },
   },
   watch: {
     async metamask_account() {
@@ -367,6 +489,7 @@ export default {
         this.show_metamask_account.innerHTML =
           (await this.metamask_account.substr(0, 18)) + "...";
         this.metamask_conected = true;
+        this.ContractServiceData();
       }
     },
     async binance_account() {
@@ -374,6 +497,7 @@ export default {
         this.show_binance_account.innerHTML =
           (await this.binance_account.substr(0, 18)) + "...";
         this.binance_conected = true;
+        this.ContractServiceData();
       }
     },
   },
