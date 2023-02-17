@@ -10,6 +10,7 @@ export default defineConfig({
     port: 3000,
   },
   plugins: [vue()],
+  base: "/smart-contract-example/",
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
